@@ -2,6 +2,9 @@
 
 namespace Libre3d\Render3d;
 
+use Libre3d\Render3d\Convert\Convert;
+use Libre3d\Render3d\Render\Render;
+
 class Render3d {
 	/**
 	 * Turn the buffer off, anything "output" will not be displayed and will not be buffered.
@@ -10,104 +13,89 @@ class Render3d {
 	 * 
 	 * Set an option with the key of "buffer" and this as the value to take effect.
 	 */
-	const BUFFER_OFF = 'off';
+	public const BUFFER_OFF = 'off';
 
 	/**
 	 * Does not buffer, lets any output echo straight to standard out.
 	 * 
 	 * Set an option with the key of "buffer" and this as the value to take effect.
 	 */
-	const BUFFER_STD_OUT = 'std_out';
+	public const BUFFER_STD_OUT = 'std_out';
 
 	/**
 	 * Turn buffering on so that you can get the contents of what would normally be output to the standard out.
 	 * 
-	 * Can then get the buffer contents using the method getBufferAndClean
+	 * Can then get the buffer contents using the method getBufferAndClean.
 	 * 
 	 * Set an option with the key of "buffer" and this as the value to take effect.
 	 */
-	const BUFFER_ON = 'on';
+	public const BUFFER_ON = 'on';
 
 	/**
 	 * Array of Renderer objects.
 	 * 
-	 * @var arrat
+	 * @var array<mixed>
 	 */
-	protected $renderers;
+	protected array $renderers;
 
 	/**
 	 * Array of converter objects.
 	 * 
-	 * @var array
+	 * @var array<\Libre3d\Render3d\Convert\Convert>
 	 */
-	protected $converters;
+	protected array $converters;
 
 	/**
-	 * Array of executables, key is the executable and value is what to use on the CMD (usually the full path to the executable)
+	 * Array of executables, key is the executable and value is what to use on the CMD (usually the full path to the executable).
 	 * 
-	 * @var array
+	 * @var array<string>
 	 */
-	protected $executables;
+	protected array $executables;
 
 	/**
-	 * The absolute path to the working directory, where all the files are being worked on
-	 * 
-	 * @var string
+	 * The absolute path to the working directory, where all the files are being worked on.
 	 */
-	protected $workingDir;
+	protected string $workingDir;
 
 	/**
 	 * The absolute path to the Render3d library.  Used internally when loading things like static files.
-	 * 
-	 * @var string
 	 */
-	protected $render3dDir;
+	protected string $render3dDir;
 
 	/**
 	 * The base filename, minus the extension.
 	 * 
-	 * All converted/rendered files will share same base name, just with different extensions that coorespond to the file type
-	 * 
-	 * @var string
+	 * All converted/rendered files will share same base name, just with different extensions that coorespond to the file type.
 	 */
-	protected $file;
+	protected string $file = '';
 
 	/**
-	 * The file type (file extension)
-	 * 
-	 * @var string
+	 * The file type (file extension).
 	 */
-	protected $fileType;
+	protected string $fileType = '';
 
 	/**
-	 * The directory mask to use when creating new directories
-	 * 
-	 * @var integer
+	 * The directory mask to use when creating new directories.
 	 */
-	protected $dirMask = 0755;
+	protected int $dirMask = 0755;
 
 	/**
-	 * Parameters set and used by converters or renderrers
+	 * Parameters set and used by converters or renderers.
 	 * 
-	 * @var array
+	 * @var array<string>
 	 */
-	protected $options = [
+	protected array $options = [
 		'buffer' => 'off'
 	];
 
-	/**
-	 * Buffer
-	 * 
-	 * @var string
-	 */
-	protected $buffer = '';
+	protected string $buffer = '';
 
 	/**
 	 * Constructor gonna construct
 	 */
 	public function __construct() {
 		// Initialize all the things
-		$this->render3dDir = dirname(__FILE__).'/';
+		$this->render3dDir = dirname(__FILE__) . '/';
 	}
 
 	/**
@@ -116,13 +104,16 @@ class Render3d {
 	 * @param string $workingDir If passed, will set the current working DIR.  Must be the absolute path.
 	 * @return string Returns the currently set working directory
 	 */
-	public function workingDir ($workingDir = null) {
+	public function workingDir (?string $workingDir = null): string
+	{
 		if (!empty($workingDir)) {
-			$this->workingDir = rtrim($workingDir, '/').'/';
+			$this->workingDir = rtrim($workingDir, '/') . '/';
+
 			if (!file_exists($this->workingDir)) {
 				mkdir($this->workingDir, $this->dirMask, true);
 			}
 		}
+
 		return $this->workingDir;
 	}
 
@@ -133,7 +124,8 @@ class Render3d {
 	 * 
 	 * @return string
 	 */
-	public function sceneDir() {
+	public function sceneDir(): string
+	{
 		return $this->render3dDir . 'Scenes/';
 	}
 
@@ -152,7 +144,8 @@ class Render3d {
 	 * @return string The current filename, relative to the working directory
 	 * @throws \Exception
 	 */
-	public function filename($filename = null) {
+	public function filename(?string $filename = null): string
+	{
 		if (!empty($filename)) {
 			$pathInfo = pathinfo($filename);
 			if (!empty($pathInfo['dirname']) && $pathInfo['dirname'] !== '.' && file_exists($filename)) {
@@ -160,16 +153,20 @@ class Render3d {
 					// Set the working dir based on the file path
 					throw new \Exception('Working directory required.');
 				}
+
 				// Copy it into the working folder
 				$copyResult = copy($filename, $this->workingDir . $pathInfo['basename']);
+
 				if (!$copyResult) {
 					throw new \Exception('Copying file to working directory failed.');
 				}
 			}
+
 			// NOTE: Filename will be minus the extension
 			$this->file = $pathInfo['filename'];
-			$this->fileType = empty($pathInfo['extension']) ? '' : $pathInfo['extension'];
+			$this->fileType = $pathInfo['extension'] ?? '';
 		}
+
 		return $this->file . '.' . $this->fileType;
 	}
 
@@ -177,12 +174,14 @@ class Render3d {
 	 * Get and/or set the current base name used for all files being processed.
 	 * 
 	 * @param string $file If passed in, will set the file to the value.  Cannot include path info.
-	 * @return string The current value for the base filename (without the extension)
+	 * @return string The current value for the base filename (without the extension).
 	 */
-	public function file ($file = null) {
+	public function file (?string $file = null): string
+	{
 		if (!empty($file)) {
 			$this->file = $file;
 		}
+
 		return $this->file;
 	}
 
@@ -191,13 +190,15 @@ class Render3d {
 	 * 
 	 * In Render3d library, "fileType" is always synonymous with the file extension used.
 	 * 
-	 * @param string $fileType The file type, without a leading '.'
+	 * @param string $fileType The file type, without a leading '.'.
 	 * @return string the current file type (file extension) without the dot.
 	 */
-	public function fileType($fileType = null) {
+	public function fileType(?string $fileType = null): string
+	{
 		if (!empty($fileType)) {
 			$this->fileType = $fileType;
 		}
+
 		return $this->fileType;
 	}
 
@@ -207,10 +208,12 @@ class Render3d {
 	 * @param int $dirMask
 	 * @return int
 	 */
-	public function dirMask($dirMask = null) {
+	public function dirMask(?int $dirMask = null): int
+	{
 		if (!empty($dirMask)) {
-			$this->dirMask = (int)$dirMask;
+			$this->dirMask = $dirMask;
 		}
+
 		return $this->dirMask;
 	}
 
@@ -220,28 +223,32 @@ class Render3d {
 	 * If using as a getter (by not passing in $use), and that executable has not previously been set, it returns
 	 * the $executable value.
 	 * 
-	 * @param string $executable The executable name, e.g. "ls"
-	 * @param string $use What to use on the command line for that executable, e.g. "/bin/ls"
-	 * @return string What to use for the executable
+	 * @param string $executable The executable name, e.g. "ls".
+	 * @param string $use What to use on the command line for that executable, e.g. "/bin/ls".
+	 * @return string What to use for the executable.
 	 */
-	public function executable($executable, $use=NULL) {
+	public function executable(string $executable, ?string $use = null): string
+	{
 		if (!empty($use)) {
 			$this->executables[$executable] = $use;
 		}
-		return empty($this->executables[$executable]) ? $executable : $this->executables[$executable];
+
+		return $this->executables[$executable]
+			?? $executable;
 	}
 
 	/**
 	 * Convert from the current file type to the one given.
 	 * 
 	 * @param string $fileType The "end" file type to convert to.
-	 * @param array $options Array of options for the specific conversion
+	 * @param array<mixed> $options Array of options for the specific conversion.
 	 * @return void
 	 * @throws \Exception
 	 */
-	public function convertTo ($fileType, $options = null) {
+	public function convertTo (string $fileType, ?array $options = null): void
+	{
 		if (empty($this->fileType) || empty($this->workingDir)) {
-			// File type or working dir not set
+			// File type or working dir not set.
 			throw new \Exception('Filetype and working dir are not set.');
 		}
 
@@ -249,6 +256,7 @@ class Render3d {
 		if (!empty($options)) {
 			$this->options($options);
 		}
+
 		$this->startBuffer();
 
 		$currentDir = getcwd();
@@ -257,15 +265,17 @@ class Render3d {
 		chdir($this->workingDir);
 
 		$converter = $this->getConverter($this->fileType, $fileType);
+
 		try {
 			$converter->convert();
 		} catch (\Exception $e) {
 			chdir($currentDir);
 			$this->stopBuffer();
+
 			throw $e;
 		}
 		
-		// Now go back to the starting dir
+		// Now go back to the starting dir.
 		chdir($currentDir);
 		$this->stopBuffer();
 	}
@@ -274,11 +284,11 @@ class Render3d {
 	 * Render the file and return the full path to the rendered image.
 	 * 
 	 * @param string $engine
-	 * @param array $options
+	 * @param array<mixed>|null $options
 	 * @return string Full path to rendered image file
 	 * @throws \Exception
 	 */
-	public function render ($engine = 'povray', $options = null) {
+	public function render (string $engine = 'povray', ?array $options = null) {
 		if (empty($this->fileType) || empty($this->workingDir)) {
 			// File type or working dir not set
 			throw new \Exception('Filetype and Workingdir must be set first.');
@@ -316,13 +326,15 @@ class Render3d {
 	 * 
 	 * @param string $fromType
 	 * @param string $toType
-	 * @return libre3d\Render3d\Convert\Convert
+	 * @return \Libre3d\Render3d\Convert\Convert
 	 */
-	public function getConverter($fromType, $toType) {
+	public function getConverter(string $fromType, string $toType): Convert
+	{
 		if (!isset($this->converters[$fromType][$toType])) {
 			$class = 'Libre3d\Render3d\Convert\\'.ucfirst($fromType).ucfirst($toType);
 			$this->registerConverter($class, $fromType, $toType);
 		}
+
 		return $this->converters[$fromType][$toType];
 	}
 
@@ -330,55 +342,65 @@ class Render3d {
 	 * Get renderer object for the given render engine.
 	 * 
 	 * @param string $engine 
-	 * @return Libre3d\Render3d\Render\Render
+	 * @return \Libre3d\Render3d\Render\Render
 	 */
-	public function getRenderer($engine) {
+	public function getRenderer(string $engine): Render
+	{
 		if (!isset($this->renderers[$engine])) {
 			$class = 'Libre3d\Render3d\Render\\'.ucfirst($engine);
 			$this->registerRenderer($class, $engine);
 		}
+
 		return $this->renderers[$engine];
 	}
 
 	/**
 	 * Register a new converter object, possibly over-writing any previously set converters for the given from and to.
 	 * 
-	 * @param string|Libre3d\Render3d\Convert\Convert $class
+	 * @param string|\Libre3d\Render3d\Convert\Convert $class
 	 * @param string $fromType
 	 * @param string $toType
 	 * @return void
 	 * @throws \Exception
 	 */
-	public function registerConverter($class, $fromType, $toType) {
+	public function registerConverter($class, string $fromType, string $toType): void
+	{
 		if (is_string($class)) {
 			if (!class_exists($class)) {
 				throw new \Exception('Class ('.$class.') does not exist.');
 			}
+
 			$class = new $class($this);
 		}
-		if (!is_subclass_of($class, '\Libre3d\Render3d\Convert\Convert')) {
+
+		if (!is_subclass_of($class, Convert::class)) {
 			throw new \Exception('Must be a sub-class of type Libre3d\Render3d\Convert\Convert.');
 		}
+
 		$this->converters[$fromType][$toType] = $class;
 	}
 
 	/**
 	 * Register a rendering engine.
 	 * 
-	 * @param string|Libre3d\Render3d\Render\Render $class
+	 * @param string|\Libre3d\Render3d\Render\Render $class
 	 * @param string $engine
 	 * @return void
 	 */
-	public function registerRenderer($class, $engine) {
+	public function registerRenderer($class, $engine): void
+	{
 		if (is_string($class)) {
 			if (!class_exists($class)) {
 				throw new \Exception('Class ('.$class.') does not exist.');
 			}
+
 			$class = new $class($this);
 		}
+
 		if (!is_subclass_of($class, '\Libre3d\Render3d\Render\Render')) {
 			throw new \Exception('Must be a sub-class of type Libre3d\Render3d\Render\Render.');
 		}
+
 		$this->renderers[$engine] = $class;
 	}
 
@@ -388,31 +410,38 @@ class Render3d {
 	 * Useful to easily log results to file, also useful for test mocking.
 	 * 
 	 * @param string $call
+	 * @return string|bool
 	 */
-	public function cmd ($call) {
+	public function cmd (string $call)
+	{
 		system ($call . " 2> {$this->workingDir}last_error.txt", $result);
 		
 		$errContents = trim(file_get_contents("{$this->workingDir}last_error.txt"));
+
 		if (strlen($errContents)) {
-			//print it red so it's noticed...  Note that this is wrapped in a buffer
+			//print it red so it's noticed...  Note that this is wrapped in a buffer.
 			echo "<span style='color: red;'>$errContents</span>\n";
 		}
+
 		return $result;
 	}
 
 	/**
-	 * Get or set the options used by converters or renderers
+	 * Get or set the options used by converters or renderers.
 	 * 
-	 * @param array $options
-	 * @return array
+	 * @param array<mixed>|null $options
+	 * @return array<mixed>
 	 */
-	public function options($options = null) {
+	public function options(?array $options = null): array
+	{
 		if (!empty($options) && is_array($options)) {
 			if (!empty($this->options)) {
 				$options = array_merge($this->options, $options);
 			}
+
 			$this->options = $options;
 		}
+
 		return $this->options;
 	}
 
@@ -424,42 +453,44 @@ class Render3d {
 	 * 
 	 * @return string
 	 */
-	public function getBufferAndClean() {
+	public function getBufferAndClean(): string
+	{
 		$return = $this->buffer;
 		$this->buffer = '';
+
 		return $return;
 	}
 
 	/**
-	 * Start the buffer, according to option set for "buffer"
+	 * Start the buffer, according to option set for "buffer".
 	 * 
 	 * @return void
 	 */
-	protected function startBuffer() {
-		if ($this->options['buffer'] === static::BUFFER_STD_OUT) {
-			// Buffer set to "standard out" so do not actually buffer anything, let it echo out
-			return;
+	protected function startBuffer(): void
+	{
+		if ($this->options['buffer'] !== self::BUFFER_STD_OUT) {
+			ob_start();
 		}
-		ob_start();
 	}
 
 	/**
-	 * Stop the buffer and do what is needed, according to option set for "buffer"
+	 * Stop the buffer and do what is needed, according to option set for "buffer".
 	 * 
 	 * @return void
 	 */
-	protected function stopBuffer() {
+	protected function stopBuffer(): void
+	{
 		switch ($this->options['buffer']) {
 			case static::BUFFER_ON:
 				$this->buffer .= "\n" . ob_get_clean();
 				break;
 
 			case static::BUFFER_STD_OUT:
-				// Nothing to do, output sent directly to std out
+				// Nothing to do, output sent directly to std out.
 				break;
 
 			case static::BUFFER_OFF:
-				// Fall through to default
+				// Fall through to default.
 			default:
 				ob_end_clean();
 				break;
