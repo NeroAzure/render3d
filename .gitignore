@@ -8,3 +8,4 @@ composer.lock
 ### Non-standard: ###
 
 .DS_Store
+.phpunit.result.cache
