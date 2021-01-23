@@ -2,23 +2,24 @@
 
 namespace Libre3d\Test\Render3d;
 
+use Exception;
+use Libre3d\Render3d\Convert\Convert;
 use \Libre3d\Render3d\Render3d;
+use Libre3d\Render3d\Render\Render;
 
-class Render3dTest extends Render3dTestCase {
-	/**
-	 * Render3d object
-	 * 
-	 * @var \Libre3d\Render3d\Render3d
-	 */
-	protected $render3d;
+class Render3dTest extends Render3dTestCase
+{
+	protected Render3d $render3d;
 
-	public function setUp() {
+	public function setUp(): void
+	{
 		$this->render3d = new Render3d();
 
 		parent::setUp();
 	}
 
-	public function testWorkingDir() {
+	public function testWorkingDir(): void
+	{
 		$this->assertFalse(file_exists($this->workingDir));
 
 		$this->render3d->workingDir($this->workingDir);
@@ -28,9 +29,8 @@ class Render3dTest extends Render3dTestCase {
 		$this->assertEquals($this->workingDir, $this->render3d->workingDir());
 	}
 
-	public function testFilename() {
-		$workingDir = '/tmp/testDir/';
-
+	public function testFilename(): void
+	{
 		// Test normal filename
 		$filename = $this->render3d->filename('filename.ext');
 		$this->assertEquals('filename.ext', $filename);
@@ -39,7 +39,7 @@ class Render3dTest extends Render3dTestCase {
 
 		$this->render3d->workingDir($this->workingDir);
 
-		$this->assertFileNotExists($this->workingDir . 'example.scad');
+		$this->assertFileDoesNotExist($this->workingDir . 'example.scad');
 
 		$filename = $this->render3d->filename($this->testFilesDir . 'example.scad');
 
@@ -55,17 +55,18 @@ class Render3dTest extends Render3dTestCase {
 
 	/**
 	 * Make sure it throws exception if filename called with full path and working DIR is not set
-	 * 
-	 * @return void
-	 * @expectedException \Exception
-	 * @expectedExceptionMessage Working directory required.
 	 */
-	public function testFilenameWorkingdirException() {
+	public function testFilenameWorkingdirException(): void
+	{
+		$this->expectException(Exception::class);
+		$this->expectExceptionMessage('Working directory required');
+
 		// Just call filename without calling workingDir first
 		$this->render3d->filename($this->testFilesDir.'example.scad');
 	}
 
-	public function testFile() {
+	public function testFile(): void
+	{
 		// Without seeing anything, file should be empty
 		$this->assertEmpty($this->render3d->file());
 		$this->assertEquals('file1', $this->render3d->file('file1'));
@@ -77,7 +78,8 @@ class Render3dTest extends Render3dTestCase {
 		$this->assertEquals('file2', $this->render3d->file());
 	}
 
-	public function testFileType() {
+	public function testFileType(): void
+	{
 		// Without seeing anything, it should be empty
 		$this->assertEmpty($this->render3d->fileType());
 		$this->assertEquals('ext1', $this->render3d->fileType('ext1'));
@@ -89,7 +91,8 @@ class Render3dTest extends Render3dTestCase {
 		$this->assertEquals('ext2', $this->render3d->fileType());
 	}
 
-	public function testDirMask() {
+	public function testDirMask(): void
+	{
 		// Without seeing anything, it should be empty
 		$this->assertEquals(0755, $this->render3d->dirMask());
 		$this->assertEquals(0765, $this->render3d->dirMask(0765));
@@ -101,7 +104,8 @@ class Render3dTest extends Render3dTestCase {
 		$this->assertEquals(0111, $this->render3d->dirMask());
 	}
 
-	public function testExecutable() {
+	public function testExecutable(): void
+	{
 		// Without seeing anything, it should return command
 		$this->assertEquals('exe1', $this->render3d->executable('exe1'));
 		$this->assertEquals('/bin/exe1', $this->render3d->executable('exe1', '/bin/exe1'));
@@ -113,8 +117,11 @@ class Render3dTest extends Render3dTestCase {
 		$this->assertEquals('/usr/bin/exe2', $this->render3d->executable('exe2'));
 	}
 
-	public function testRender() {
-		$render = $this->getMock('\Libre3d\Render3d\Render\Render', ['render'], [$this->render3d]);
+	public function testRender(): void
+	{
+		$render = $this->getMockBuilder(Render::class)
+			->disableOriginalConstructor()
+			->getMock();
 
 		$render->expects($this->once())
 			->method('render');
@@ -127,10 +134,14 @@ class Render3dTest extends Render3dTestCase {
 		$this->render3d->render('engine');
 	}
 
-	public function testConvertTo() {
-		$converter = $this->getMock('\Libre3d\Render3d\Convert\Convert', ['convert'], [$this->render3d]);
+	public function testConvertTo(): void
+	{
+		$converter = $this->getMockBuilder(Convert::class)
+			->disableOriginalConstructor()
+			->getMock();
 
-		$converter->expects($this->once())
+		$converter
+			->expects($this->once())
 			->method('convert');
 
 		$this->render3d->registerConverter($converter, 'from-type', 'to-type');
@@ -141,12 +152,15 @@ class Render3dTest extends Render3dTestCase {
 		$this->render3d->convertTo('to-type');
 	}
 
-	public function testCmdBuffer() {
+	public function testCmdBuffer(): void
+	{
 		$msg = 'AYB';
 		$this->render3d->workingDir($this->workingDir);
 		$this->render3d->filename('file.from');
-		
-		$converter = $this->getMock('\Libre3d\Render3d\Convert\Convert', ['convert'], [$this->render3d]);
+
+		$converter = $this->getMockBuilder(Convert::class)
+			->disableOriginalConstructor()
+			->getMock();
 
 		$converter->expects($this->any())
 			->method('convert')
@@ -178,7 +192,8 @@ class Render3dTest extends Render3dTestCase {
 		$this->assertEmpty(ob_get_clean());
 	}
 
-	public function testOptions() {
+	public function testOptions(): void
+	{
 		$defaultOptions = $this->render3d->options();
 
 		$this->render3d->options(['param1' => 'val1']);

@@ -2,13 +2,18 @@
 
 namespace Libre3d\Test\Render3d\Convert;
 
-use \Libre3d\Render3d\Render3d,
-	\Libre3d\Render3d\Convert\ScadStl,
-	\Libre3d\Test\Render3d\Render3dTestCase;
+use Libre3d\Render3d\Render3d;
+use	Libre3d\Render3d\Convert\ScadStl;
+use Libre3d\Test\Render3d\Render3dTestCase;
 
-class ScadStlTest extends Render3dTestCase {
-	public function testConvert() {
-		$render3d = $this->getMock('\Libre3d\Render3d\Render3d', ['cmd']);
+class ScadStlTest extends Render3dTestCase
+{
+	public function testConvert(): void
+	{
+		/** @var \Libre3d\Render3d\Render3d|\PHPUnit\Framework\MockObject\MockObject $render3d */
+		$render3d = $this->getMockBuilder(Render3d::class)
+			->onlyMethods(['cmd'])
+			->getMock();
 
 		$render3d->expects($this->once())
 			->method('cmd')

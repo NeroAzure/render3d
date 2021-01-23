@@ -2,32 +2,30 @@
 
 namespace Libre3d\Test\Render3d;
 
-class Render3dTestCase extends \PHPUnit_Framework_TestCase {
+use PHPUnit\Framework\TestCase;
+
+class Render3dTestCase extends TestCase
+{
 	/**
 	 * The full path to the Tests/Files/ folder.
-	 * 
-	 * @var string
 	 */
-	protected $testFilesDir;
+	protected string $testFilesDir;
 
 	/**
 	 * The full path to a temporary working directory to use for tests.
 	 * 
 	 * Note that the working directory starts out not created (so that it can test creating the directory)
-	 * 
-	 * @var string
 	 */
-	protected $workingDir;
+	protected string $workingDir;
 
 	/**
 	 * If set to true, will not clean up after itself by removing working dir
-	 * 
-	 * @var boolean
 	 */
-	protected $keepWorkingDir = false;
+	protected bool $keepWorkingDir = false;
 
 
-	public function setUp() {
+	public function setUp(): void
+	{
 		$this->workingDir = sys_get_temp_dir() . '/Render3dTests/';
 		$this->testFilesDir = dirname(__FILE__) . '/Files/';
 
@@ -37,7 +35,8 @@ class Render3dTestCase extends \PHPUnit_Framework_TestCase {
 		parent::setUp();
 	}
 
-	public function tearDown() {
+	public function tearDown(): void
+	{
 		// Remove any files created
 		$this->removeWorkingDir();
 
@@ -46,10 +45,9 @@ class Render3dTestCase extends \PHPUnit_Framework_TestCase {
 
 	/**
 	 * Removes the currently set working directory and all contents.
-	 * 
-	 * @return void
 	 */
-	protected function removeWorkingDir () {
+	protected function removeWorkingDir (): void
+	{
 		if (!$this->keepWorkingDir && $this->workingDir && file_exists($this->workingDir)) {
 			array_map('unlink', glob($this->workingDir . '*'));
 			rmdir($this->workingDir);
