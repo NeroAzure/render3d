@@ -2,9 +2,13 @@
 
 namespace Libre3d\Render3d;
 
+use Exception;
 use Libre3d\Render3d\Convert\Convert;
 use Libre3d\Render3d\Render\Render;
 
+/**
+ * @todo Use custom Exceptions
+ */
 class Render3d {
 	/**
 	 * Turn the buffer off, anything "output" will not be displayed and will not be buffered.
@@ -34,14 +38,14 @@ class Render3d {
 	/**
 	 * Array of Renderer objects.
 	 * 
-	 * @var array<mixed>
+	 * @var array<\Libre3d\Render3d\Render\Render>
 	 */
 	protected array $renderers;
 
 	/**
 	 * Array of converter objects.
 	 * 
-	 * @var array<\Libre3d\Render3d\Convert\Convert>
+	 * @var array<array<\Libre3d\Render3d\Convert\Convert>>
 	 */
 	protected array $converters;
 
@@ -93,7 +97,8 @@ class Render3d {
 	/**
 	 * Constructor gonna construct
 	 */
-	public function __construct() {
+	public function __construct()
+	{
 		// Initialize all the things
 		$this->render3dDir = dirname(__FILE__) . '/';
 	}
@@ -101,7 +106,7 @@ class Render3d {
 	/**
 	 * Get and/or set the current working DIR.
 	 * 
-	 * @param string $workingDir If passed, will set the current working DIR.  Must be the absolute path.
+	 * @param string|null $workingDir If passed, will set the current working DIR.  Must be the absolute path.
 	 * @return string Returns the currently set working directory
 	 */
 	public function workingDir (?string $workingDir = null): string
@@ -139,7 +144,7 @@ class Render3d {
 	 * the workingDir is already set, it will automatically copy in the file from the specified path into the currently
 	 * set working directory as well, or throw an exception if the working directory is not set.
 	 * 
-	 * @param string $filename If set, will try to set file and filetype accordingly, and possibly copy the file into
+	 * @param string|null $filename If set, will try to set file and filetype accordingly, and possibly copy the file into
 	 *   the working directory.
 	 * @return string The current filename, relative to the working directory
 	 * @throws \Exception
@@ -151,14 +156,14 @@ class Render3d {
 			if (!empty($pathInfo['dirname']) && $pathInfo['dirname'] !== '.' && file_exists($filename)) {
 				if (empty($this->workingDir)) {
 					// Set the working dir based on the file path
-					throw new \Exception('Working directory required.');
+					throw new Exception('Working directory required.');
 				}
 
 				// Copy it into the working folder
 				$copyResult = copy($filename, $this->workingDir . $pathInfo['basename']);
 
 				if (!$copyResult) {
-					throw new \Exception('Copying file to working directory failed.');
+					throw new Exception('Copying file to working directory failed.');
 				}
 			}
 
@@ -173,7 +178,7 @@ class Render3d {
 	/**
 	 * Get and/or set the current base name used for all files being processed.
 	 * 
-	 * @param string $file If passed in, will set the file to the value.  Cannot include path info.
+	 * @param string|null $file If passed in, will set the file to the value.  Cannot include path info.
 	 * @return string The current value for the base filename (without the extension).
 	 */
 	public function file (?string $file = null): string
@@ -190,7 +195,7 @@ class Render3d {
 	 * 
 	 * In Render3d library, "fileType" is always synonymous with the file extension used.
 	 * 
-	 * @param string $fileType The file type, without a leading '.'.
+	 * @param string|null $fileType The file type, without a leading '.'.
 	 * @return string the current file type (file extension) without the dot.
 	 */
 	public function fileType(?string $fileType = null): string
@@ -205,7 +210,7 @@ class Render3d {
 	/**
 	 * Get and/or set the current directory mask used when creating a new directory.
 	 * 
-	 * @param int $dirMask
+	 * @param int|null $dirMask
 	 * @return int
 	 */
 	public function dirMask(?int $dirMask = null): int
@@ -224,7 +229,7 @@ class Render3d {
 	 * the $executable value.
 	 * 
 	 * @param string $executable The executable name, e.g. "ls".
-	 * @param string $use What to use on the command line for that executable, e.g. "/bin/ls".
+	 * @param string|null $use What to use on the command line for that executable, e.g. "/bin/ls".
 	 * @return string What to use for the executable.
 	 */
 	public function executable(string $executable, ?string $use = null): string
@@ -241,7 +246,7 @@ class Render3d {
 	 * Convert from the current file type to the one given.
 	 * 
 	 * @param string $fileType The "end" file type to convert to.
-	 * @param array<mixed> $options Array of options for the specific conversion.
+	 * @param array<mixed>|null $options Array of options for the specific conversion.
 	 * @return void
 	 * @throws \Exception
 	 */
@@ -249,7 +254,7 @@ class Render3d {
 	{
 		if (empty($this->fileType) || empty($this->workingDir)) {
 			// File type or working dir not set.
-			throw new \Exception('Filetype and working dir are not set.');
+			throw new Exception('Filetype and working dir are not set.');
 		}
 
 		// Set the options
@@ -268,7 +273,7 @@ class Render3d {
 
 		try {
 			$converter->convert();
-		} catch (\Exception $e) {
+		} catch (Exception $e) {
 			chdir($currentDir);
 			$this->stopBuffer();
 
@@ -291,8 +296,9 @@ class Render3d {
 	public function render (string $engine = 'povray', ?array $options = null) {
 		if (empty($this->fileType) || empty($this->workingDir)) {
 			// File type or working dir not set
-			throw new \Exception('Filetype and Workingdir must be set first.');
+			throw new Exception('Filetype and Workingdir must be set first.');
 		}
+		
 		// Set the options
 		if (!empty($options)) {
 			$this->options($options);
@@ -308,7 +314,7 @@ class Render3d {
 		$renderer = $this->getRenderer($engine);
 		try {
 			$result = $renderer->render();
-		} catch (\Exception $e) {
+		} catch (Exception $e) {
 			chdir($currentDir);
 			$this->stopBuffer();
 			throw $e;
@@ -367,14 +373,14 @@ class Render3d {
 	{
 		if (is_string($class)) {
 			if (!class_exists($class)) {
-				throw new \Exception('Class ('.$class.') does not exist.');
+				throw new Exception('Class ('.$class.') does not exist.');
 			}
 
 			$class = new $class($this);
 		}
 
 		if (!is_subclass_of($class, Convert::class)) {
-			throw new \Exception('Must be a sub-class of type Libre3d\Render3d\Convert\Convert.');
+			throw new Exception('Must be a sub-class of type Libre3d\Render3d\Convert\Convert.');
 		}
 
 		$this->converters[$fromType][$toType] = $class;
@@ -387,18 +393,18 @@ class Render3d {
 	 * @param string $engine
 	 * @return void
 	 */
-	public function registerRenderer($class, $engine): void
+	public function registerRenderer($class, string $engine): void
 	{
 		if (is_string($class)) {
 			if (!class_exists($class)) {
-				throw new \Exception('Class ('.$class.') does not exist.');
+				throw new Exception('Class ('.$class.') does not exist.');
 			}
 
 			$class = new $class($this);
 		}
 
-		if (!is_subclass_of($class, '\Libre3d\Render3d\Render\Render')) {
-			throw new \Exception('Must be a sub-class of type Libre3d\Render3d\Render\Render.');
+		if (!is_subclass_of($class, Render::class)) {
+			throw new Exception('Must be a sub-class of type Libre3d\Render3d\Render\Render.');
 		}
 
 		$this->renderers[$engine] = $class;

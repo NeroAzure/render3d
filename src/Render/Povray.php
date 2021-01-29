@@ -2,6 +2,8 @@
 
 namespace Libre3d\Render3d\Render;
 
+use Exception;
+
 class Povray extends Render {
 	/**
 	 * Renders the current file.
@@ -12,26 +14,16 @@ class Povray extends Render {
 	 * @return string Return the full path to the rendered image, or boolean false if there are any problems
 	 * @throws \Exception throws exception if there are problems rendering the image
 	 */
-	public function render() {
+	public function render(): string
+	{
 		// Allow "chaned" actions so can just call render and this does all the conversion necessary
 		$this->preConvert();
 
 		if ($this->Render3d->fileType() !== 'pov') {
-			throw new \Exception('Invalid file type, cannot render this file.');
+			throw new Exception('Invalid file type, cannot render this file.');
 		}
 
-		$defaults = [
-			'width' => 1600,
-			'height' => 1200,
-		];
-		$defaults['povray'] = $this->Render3d->executable('povray');
-
-		if (strpos($defaults['povray'], '/') !== false) {
-			$defaults['PovLibraryIncDir'] = dirname($defaults['povray']) . '/include';
-		}
-		$defaults['PovOutFile'] = $this->Render3d->workingDir() . $this->Render3d->file() . '.png';
-
-		$opts = array_merge($defaults, $this->Render3d->options());
+		$opts = array_merge($this->defaults(), $this->Render3d->options());
 
 		$pov = $this->Render3d->filename();
 		
@@ -51,18 +43,35 @@ class Povray extends Render {
 		}
 
 		$this->Render3d->cmd($cmd);
-		if (!file_exists($opts['PovOutFile'])) {
-			throw new \Exception('Something went wrong when rendering.');
+
+		if (! file_exists($opts['PovOutFile'])) {
+			throw new Exception('Something went wrong when rendering.');
 		}
+
 		return $opts['PovOutFile'];
 	}
 
-	protected function preConvert () {
+	protected function defaults(): array
+	{
+		$povRayExecutable = $this->Render3d->executable('povray');
+
+		return [
+			'width' => 1600,
+			'height' => 1200,
+			'povray' => $povRayExecutable,
+			'PovLibraryIncDir' => strpos($povRayExecutable, '/') !== false
+				? dirname($povRayExecutable) . '/include'
+				: '',
+			'PovOutFile' => $this->Render3d->workingDir() . $this->Render3d->file() . '.png'
+		];
+	}
+
+	protected function preConvert (): void
+	{
 		switch ($this->Render3d->fileType()) {
 			case 'scad':
 				$this->Render3d->convertTo('stl');
-				// Break ommited on purpose
-			
+				// Break omitted on purpose
 			case 'stl':
 				$this->Render3d->convertTo('pov');
 				break;
