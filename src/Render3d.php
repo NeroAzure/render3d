@@ -1,10 +1,10 @@
 <?php
 
-namespace Libre3d\Render3d;
+namespace NeroAzure\Render3d;
 
 use Exception;
-use Libre3d\Render3d\Convert\Convert;
-use Libre3d\Render3d\Render\Render;
+use NeroAzure\Render3d\Convert\Convert;
+use NeroAzure\Render3d\Render\Render;
 
 /**
  * @todo Use custom Exceptions
@@ -38,14 +38,14 @@ class Render3d {
 	/**
 	 * Array of Renderer objects.
 	 * 
-	 * @var array<\Libre3d\Render3d\Render\Render>
+	 * @var array<\NeroAzure\Render3d\Render\Render>
 	 */
 	protected array $renderers;
 
 	/**
 	 * Array of converter objects.
 	 * 
-	 * @var array<array<\Libre3d\Render3d\Convert\Convert>>
+	 * @var array<array<\NeroAzure\Render3d\Convert\Convert>>
 	 */
 	protected array $converters;
 
@@ -332,12 +332,12 @@ class Render3d {
 	 * 
 	 * @param string $fromType
 	 * @param string $toType
-	 * @return \Libre3d\Render3d\Convert\Convert
+	 * @return \NeroAzure\Render3d\Convert\Convert
 	 */
 	public function getConverter(string $fromType, string $toType): Convert
 	{
 		if (!isset($this->converters[$fromType][$toType])) {
-			$class = 'Libre3d\Render3d\Convert\\'.ucfirst($fromType).ucfirst($toType);
+			$class = 'NeroAzure\Render3d\Convert\\'.ucfirst($fromType).ucfirst($toType);
 			$this->registerConverter($class, $fromType, $toType);
 		}
 
@@ -348,12 +348,12 @@ class Render3d {
 	 * Get renderer object for the given render engine.
 	 * 
 	 * @param string $engine 
-	 * @return \Libre3d\Render3d\Render\Render
+	 * @return \NeroAzure\Render3d\Render\Render
 	 */
 	public function getRenderer(string $engine): Render
 	{
 		if (!isset($this->renderers[$engine])) {
-			$class = 'Libre3d\Render3d\Render\\'.ucfirst($engine);
+			$class = 'NeroAzure\Render3d\Render\\'.ucfirst($engine);
 			$this->registerRenderer($class, $engine);
 		}
 
@@ -363,7 +363,7 @@ class Render3d {
 	/**
 	 * Register a new converter object, possibly over-writing any previously set converters for the given from and to.
 	 * 
-	 * @param string|\Libre3d\Render3d\Convert\Convert $class
+	 * @param string|\NeroAzure\Render3d\Convert\Convert $class
 	 * @param string $fromType
 	 * @param string $toType
 	 * @return void
@@ -380,7 +380,7 @@ class Render3d {
 		}
 
 		if (!is_subclass_of($class, Convert::class)) {
-			throw new Exception('Must be a sub-class of type Libre3d\Render3d\Convert\Convert.');
+			throw new Exception('Must be a sub-class of type NeroAzure\Render3d\Convert\Convert.');
 		}
 
 		$this->converters[$fromType][$toType] = $class;
@@ -389,7 +389,7 @@ class Render3d {
 	/**
 	 * Register a rendering engine.
 	 * 
-	 * @param string|\Libre3d\Render3d\Render\Render $class
+	 * @param string|\NeroAzure\Render3d\Render\Render $class
 	 * @param string $engine
 	 * @return void
 	 */
@@ -404,7 +404,7 @@ class Render3d {
 		}
 
 		if (!is_subclass_of($class, Render::class)) {
-			throw new Exception('Must be a sub-class of type Libre3d\Render3d\Render\Render.');
+			throw new Exception('Must be a sub-class of type NeroAzure\Render3d\Render\Render.');
 		}
 
 		$this->renderers[$engine] = $class;

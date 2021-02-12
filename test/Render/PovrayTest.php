@@ -1,11 +1,11 @@
 <?php
 
-namespace Libre3d\Test\Render3d\Render;
+namespace NeroAzure\Test\Render3d\Render;
 
 use Exception;
-use Libre3d\Render3d\Render3d;
-use Libre3d\Render3d\Render\Povray;
-use Libre3d\Test\Render3d\Render3dTestCase;
+use NeroAzure\Render3d\Render3d;
+use NeroAzure\Render3d\Render\Povray;
+use NeroAzure\Test\Render3d\Render3dTestCase;
 
 class PovrayTest extends Render3dTestCase
 {
@@ -16,7 +16,7 @@ class PovrayTest extends Render3dTestCase
 	public function testRenderConverts(): void
 	{
 		$this->markTestSkipped('Deprecated methods need to be removed, also test fails');
-		/** @var \Libre3d\Render3d\Render3d|\PHPUnit\Framework\MockObject\MockObject $render3d */
+		/** @var \NeroAzure\Render3d\Render3d|\PHPUnit\Framework\MockObject\MockObject $render3d */
 		$render3d = $this->getMockBuilder(Render3d::class)
 			->onlyMethods(['cmd', 'convertTo'])
 			->getMock();
@@ -47,7 +47,7 @@ class PovrayTest extends Render3dTestCase
 	 */
 	public function testRenderReturn(): void
 	{
-		/** @var \Libre3d\Render3d\Render3d|\PHPUnit\Framework\MockObject\MockObject $render3d */
+		/** @var \NeroAzure\Render3d\Render3d|\PHPUnit\Framework\MockObject\MockObject $render3d */
 		$render3d = $this->getMockBuilder(Render3d::class)
 			->onlyMethods(['cmd', 'convertTo'])
 			->getMock();
@@ -75,7 +75,7 @@ class PovrayTest extends Render3dTestCase
 	 */
 	public function testRenderFail(): void
 	{
-		/** @var \Libre3d\Render3d\Render3d|\PHPUnit\Framework\MockObject\MockObject $render3d */
+		/** @var \NeroAzure\Render3d\Render3d|\PHPUnit\Framework\MockObject\MockObject $render3d */
 		$render3d = $this->getMockBuilder(Render3d::class)
 			->onlyMethods(['cmd', 'convertTo'])
 			->getMock();

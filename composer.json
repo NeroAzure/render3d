@@ -1,5 +1,5 @@
 {
-	"name": "neroazure/render-3d",
+	"name": "neroazure/render3d",
 	"type": "library",
 	"description": "Wrapper library to help render preview images for common 3D file formats.",
 	"keywords": ["render", "stl", "scad"],
@@ -27,8 +27,8 @@
 	},
 	"autoload": {
 		"psr-4": {
-			"Libre3d\\Render3d\\": "src",
-			"Libre3d\\Test\\Render3d\\" : "test"
+			"NeroAzure\\Render3d\\": "src",
+			"NeroAzure\\Test\\Render3d\\" : "test"
 		}
 	}
 }

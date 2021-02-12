@@ -1,6 +1,6 @@
 <?php
 
-namespace Libre3d\Render3d\Render;
+namespace NeroAzure\Render3d\Render;
 
 use Exception;
 

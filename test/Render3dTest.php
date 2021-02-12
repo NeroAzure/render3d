@@ -1,11 +1,11 @@
 <?php
 
-namespace Libre3d\Test\Render3d;
+namespace NeroAzure\Test\Render3d;
 
 use Exception;
-use Libre3d\Render3d\Convert\Convert;
-use \Libre3d\Render3d\Render3d;
-use Libre3d\Render3d\Render\Render;
+use NeroAzure\Render3d\Convert\Convert;
+use \NeroAzure\Render3d\Render3d;
+use NeroAzure\Render3d\Render\Render;
 
 class Render3dTest extends Render3dTestCase
 {

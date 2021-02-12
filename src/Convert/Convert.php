@@ -1,8 +1,8 @@
 <?php
 
-namespace Libre3d\Render3d\Convert;
+namespace NeroAzure\Render3d\Convert;
 
-use Libre3d\Render3d\Render3d;
+use NeroAzure\Render3d\Render3d;
 
 /**
  * The convert abstract class.  All converters must extend this.
@@ -21,7 +21,7 @@ abstract class Convert {
 	/**
 	 * Constructor gonna construct.
 	 * 
-	 * @param \Libre3d\Render3d\Render3d $render3d 
+	 * @param \NeroAzure\Render3d\Render3d $render3d 
 	 */
 	public function __construct(Render3d $render3d)
 	{

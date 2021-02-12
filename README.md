@@ -42,7 +42,7 @@ a quick example, there are many options and different ways that files can be ren
 
 ```php
 
-$render3d = new \Libre3d\Render3d\Render3d();
+$render3d = new \NeroAzure\Render3d\Render3d();
 
 // this is the working directory, where it will put any files used during the render process, as well as the final
 // rendered image.

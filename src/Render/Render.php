@@ -1,8 +1,8 @@
 <?php
 
-namespace Libre3d\Render3d\Render;
+namespace NeroAzure\Render3d\Render;
 
-use Libre3d\Render3d\Render3d;
+use NeroAzure\Render3d\Render3d;
 
 /**
  * The render abstract class. All renderers must extend this.
@@ -16,7 +16,7 @@ abstract class Render {
 	/**
 	 * Constructor gonna construct.
 	 * 
-	 * @param \Libre3d\Render3d\Render3d $render3d
+	 * @param \NeroAzure\Render3d\Render3d $render3d
 	 */
 	public function __construct(Render3d $render3d)
 	{

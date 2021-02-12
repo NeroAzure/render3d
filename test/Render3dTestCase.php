@@ -1,6 +1,6 @@
 <?php
 
-namespace Libre3d\Test\Render3d;
+namespace NeroAzure\Test\Render3d;
 
 use PHPUnit\Framework\TestCase;
 

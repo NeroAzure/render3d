@@ -1,16 +1,16 @@
 <?php
 
-namespace Libre3d\Test\Render3d\Convert;
+namespace NeroAzure\Test\Render3d\Convert;
 
-use Libre3d\Render3d\Render3d;
-use	Libre3d\Render3d\Convert\ScadStl;
-use Libre3d\Test\Render3d\Render3dTestCase;
+use NeroAzure\Render3d\Render3d;
+use	NeroAzure\Render3d\Convert\ScadStl;
+use NeroAzure\Test\Render3d\Render3dTestCase;
 
 class ScadStlTest extends Render3dTestCase
 {
 	public function testConvert(): void
 	{
-		/** @var \Libre3d\Render3d\Render3d|\PHPUnit\Framework\MockObject\MockObject $render3d */
+		/** @var \NeroAzure\Render3d\Render3d|\PHPUnit\Framework\MockObject\MockObject $render3d */
 		$render3d = $this->getMockBuilder(Render3d::class)
 			->onlyMethods(['cmd'])
 			->getMock();

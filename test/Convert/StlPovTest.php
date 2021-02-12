@@ -1,10 +1,10 @@
 <?php
 
-namespace Libre3d\Test\Render3d\Convert;
+namespace NeroAzure\Test\Render3d\Convert;
 
-use \Libre3d\Render3d\Render3d,
-	\Libre3d\Render3d\Convert\StlPov,
-	\Libre3d\Test\Render3d\Render3dTestCase;
+use \NeroAzure\Render3d\Render3d,
+	\NeroAzure\Render3d\Convert\StlPov,
+	\NeroAzure\Test\Render3d\Render3dTestCase;
 
 class StlPovTest extends Render3dTestCase {
 	public function testConvertBinary() {
