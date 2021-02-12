@@ -27,7 +27,11 @@
 	},
 	"autoload": {
 		"psr-4": {
-			"NeroAzure\\Render3d\\": "src",
+			"NeroAzure\\Render3d\\": "src"
+		}
+	},
+	"autoload-dev": {
+		"psr-4": {
 			"NeroAzure\\Test\\Render3d\\" : "test"
 		}
 	}
