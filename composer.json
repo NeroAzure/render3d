@@ -1,5 +1,5 @@
 {
-	"name": "libre3d/render-3d",
+	"name": "neroazure/render-3d",
 	"type": "library",
 	"description": "Wrapper library to help render preview images for common 3D file formats.",
 	"keywords": ["render", "stl", "scad"],
@@ -10,6 +10,11 @@
 			"name": "Jonathan Foote",
 			"email": "jf@jonathanfoote.com",
 			"homepage": "http://jonathanfoote.com",
+			"role": "Developer"
+		},
+		{
+			"name": "Kevin Buchholz",
+			"email": "neroazure@gmx.de",
 			"role": "Developer"
 		}
 	],
